@@ -62,3 +62,31 @@ else if(coding_lang == 'java'){
 else{
     codeTemplate = 'pyTemplate.txt'
 }
+
+// set directory paths
+setPaths();
+
+
+
+function setPaths(){
+    src = process.cwd();
+    dest = path.join(src,'code');
+    codeTemplatePath = path.join(src,'templates/'+codeTemplate);
+
+    // create code folder if not exist
+    if (fs.existsSync(dest) == false){         
+        fs.mkdirSync(dest);                   
+    }
+
+    dest = path.join(dest,platform);
+    // create platform folder if not exist
+    if (fs.existsSync(dest) == false){         
+        fs.mkdirSync(dest);                   
+    }
+
+    // create contest folder if not exist
+    contestPath = path.join(dest,contestId);
+    if (fs.existsSync(contestPath) == false){         
+        fs.mkdirSync(contestPath);                   
+    }
+}
