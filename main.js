@@ -163,7 +163,75 @@ async function getCodeforces(){
     
 }
 
+async function getCodechef() {
+    const browser = await puppeteer.launch({
+        headless: false,
+        args: ['--start-fullscreen', '--disable-notifications', '--incognito'],
+        defaultViewport: null,
+        slowMo: 20,
+    });
 
+    let pages = await browser.pages();
+    let page = pages[0];
+
+    // codechef contest
+    page.goto(ccUrl, {
+        waitUntil: 'networkidle2'
+    })
+    
+    // fetch no of problems
+    await page.waitForSelector('#problems-list .dataTable tbody tr td:nth-of-type(2) div',{
+        visible:true
+    });
+    let totalProbs = await page.$$eval('#problems-list .dataTable tbody tr td:nth-of-type(2) div', probs => probs.map(prob => prob.textContent));
+
+    // go to every problem and download test cases
+    for(let prob in totalProbs){
+        await page.goto('https://www.codechef.com/'+contestId+'/problems/'+totalProbs[prob],{waitUntil:'networkidle2'});
+        await page.waitForSelector('#problem-statement',{
+            visible:true
+        });
+        let data = await page.$$eval('#problem-statement pre', arr => arr.map(e => e.textContent));
+        let inputData = data[0];             // input 
+        let outputData = data[1];          // output
+        //console.log(data,inputData,outputData);
+        let problemPath = path.join(contestPath,totalProbs[prob]);                           // create problem path
+        if (fs.existsSync(problemPath) == false){           // create problem folder if not exist
+            fs.mkdirSync(problemPath);                   
+        }        
+        let inputPath = path.join(problemPath,'input.txt');
+        let outputPath = path.join(problemPath,'output.txt');
+        let yourInputPath = path.join(problemPath,'your_input.txt');
+        let yourOutputPath = path.join(problemPath,'your_output.txt');
+        let codePath = path.join(problemPath,totalProbs[prob] + '.' + coding_lang);
+        fs.writeFileSync(inputPath,'INPUT : ' + '\n' + inputData + '\n',function(err){      // create input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(outputPath,'OUTPUT : ' + '\n' + outputData + '\n',function(err){   // create output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourInputPath,"",function(err){      // create your_input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourOutputPath,"",function(err){   // create your_output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.copyFileSync(codeTemplatePath,codePath);                            // create code file
+
+    }
+
+    console.log('test cases download successfully...!!');
+    await browser.close();
+
+}
 
 function setPaths(){
     src = process.cwd();
