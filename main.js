@@ -40,3 +40,8 @@ else if(platform == '4'){
 
 // ask for contest id
 contestId = readline.question('Enter your contest ID (you will find it on the contest page URL, get copy paste from there!)\n')
+// set urls
+let cfUrl = 'https://codeforces.com/contest/'+contestId;
+let lcUrl = 'https://leetcode.com/contest/'+contestId;
+let ccUrl = 'https://www.codechef.com/'+contestId;
+let acUrl = 'https://atcoder.jp/contests/'+contestId+'/tasks';
