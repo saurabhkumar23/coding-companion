@@ -1,10 +1,13 @@
 {
   "name": "coding-companion",
   "version": "1.0.0",
-  "description": "It download test cases of all the coding problems from the platform and",
+  "description": "It download test cases of coding problems from the platform and adds template according to your coding language.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "give-testcases": "main.js"
   },
   "repository": {
     "type": "git",
