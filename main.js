@@ -48,3 +48,17 @@ let acUrl = 'https://atcoder.jp/contests/'+contestId+'/tasks';
 
 // ask for coding language
 coding_lang = readline.question('Enter your coding language: (cpp / java / py)\n')
+if(coding_lang != 'cpp' && coding_lang != 'java' && coding_lang != 'py'){
+    console.log('for now, choose cpp,java or python.')
+    process.exit()
+}
+// set codeTemplate
+if(coding_lang == 'cpp'){
+    codeTemplate = 'cppTemplate.txt'
+}
+else if(coding_lang == 'java'){
+    codeTemplate = 'javaTemplate.txt'
+}
+else{
+    codeTemplate = 'pyTemplate.txt'
+}
