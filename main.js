@@ -80,6 +80,90 @@ else{
     getAtcoder()
 }
 
+async function getCodeforces(){
+    const browser = await puppeteer.launch({
+        headless: false,
+        args: ['--start-fullscreen', '--disable-notifications', '--incognito'],
+        defaultViewport: null,
+        slowMo: 20,
+    });
+
+    let pages = await browser.pages();
+    let page = pages[0];
+
+    // codeforces contest
+    page.goto(cfUrl,{
+        waitUntil: 'networkidle2'
+    })
+
+    // fetch no of problems
+    await page.waitForSelector('.problems tbody tr td:nth-of-type(1) a',{
+        visible:true
+    });
+    totalProbs = await page.$$eval('.problems tbody tr td:nth-of-type(1) a', probs => probs.map(prob => prob.textContent));
+
+    // trim problems content
+    for(let prob in totalProbs){
+        totalProbs[prob] = totalProbs[prob].trim();
+    }
+
+    // go to every problem and download test cases
+    for(let prob in totalProbs){
+        await page.goto('https://codeforces.com/contest/'+contestId+'/problem/'+totalProbs[prob],{waitUntil:'networkidle2'});
+        await page.waitForSelector('.input',{
+            visible:true
+        });
+        let input = await page.$$eval('.input pre', arr => arr.map(e => e.textContent));      // input array
+        let output = await page.$$eval('.output pre', arr => arr.map(e => e.textContent));    // output array
+        let inputData = '';
+        let outputData = '';
+        let problemPath = path.join(contestPath,totalProbs[prob]);                           // create problem path
+        if (fs.existsSync(problemPath) == false){           // create problem folder if not exist
+            fs.mkdirSync(problemPath);                   
+        }
+        let inputPath = path.join(problemPath,'input.txt');
+        let outputPath = path.join(problemPath,'output.txt');
+        let yourInputPath = path.join(problemPath,'your_input.txt');
+        let yourOutputPath = path.join(problemPath,'your_output.txt');
+        let codePath = path.join(problemPath,totalProbs[prob] + '.' + coding_lang);
+        //console.log(input,output);
+        for(let i = 0; i < input.length ; i++){             
+            inputData += `(INPUT - ${i+1})\n${input[i]}\n`;                 // input
+        }
+        for(let i = 0 ; i < output.length ; i++){                          
+            outputData += `(OUTPUT - ${i+1})\n${output[i]}\n`;                 // output
+        }
+        //console.log(inputData);
+        //console.log(outputData);
+        fs.writeFileSync(inputPath,inputData,function(err){      // create input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(outputPath,outputData,function(err){   // create output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourInputPath,"",function(err){      // create your_input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourOutputPath,"",function(err){   // create your_output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.copyFileSync(codeTemplatePath,codePath);                            // create code file
+    }
+
+    console.log('test cases download successfully...!!');
+    await browser.close();
+    
+}
+
+
 
 function setPaths(){
     src = process.cwd();
