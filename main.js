@@ -66,6 +66,19 @@ else{
 // set directory paths
 setPaths();
 
+// calling main function 
+if(platform == 'codeforces'){
+    getCodeforces()
+}
+else if(platform == 'leetcode'){
+    getLeetcode()
+}
+else if(platform == 'codechef'){
+    getCodechef()
+}
+else{
+    getAtcoder()
+}
 
 
 function setPaths(){
