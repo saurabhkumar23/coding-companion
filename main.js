@@ -332,6 +332,83 @@ async function getLeetcode() {
 
 }
 
+async function getAtcoder() {
+    const browser = await puppeteer.launch({
+        headless: false,
+        args: ['--start-fullscreen', '--disable-notifications', '--incognito'],
+        defaultViewport: null,
+        slowMo: 20,
+    });
+
+    let pages = await browser.pages();
+    let page = pages[0];
+
+    // atcoder contest
+    page.goto(acUrl, {
+        waitUntil: 'networkidle2'
+    })
+    
+    // fetch no of problems
+    await page.waitForSelector('.table.table-bordered.table-striped tbody tr td:nth-of-type(1) a',{
+        visible:true
+    });
+    totalProbs = await page.$$eval('.table.table-bordered.table-striped tbody tr td:nth-of-type(1) a', probs => probs.map(prob => prob.textContent));
+
+    // go to every problem and download test cases
+    for(let prob in totalProbs){
+        await page.goto('https://atcoder.jp/contests/'+contestId+'/tasks/'+contestId+'_'+totalProbs[prob].toLowerCase(),{waitUntil:'networkidle2'});
+        await page.waitForSelector('#main-container #task-statement .lang-en',{
+            visible:true
+        });
+        let data = await page.$$eval('#main-container #task-statement .lang-en .part pre[id]', arr => arr.map(e => e.textContent));
+        let inputData = '';
+        let outputData = '';
+        let problemPath = path.join(contestPath,totalProbs[prob]);                           // create problem path
+        if (fs.existsSync(problemPath) == false){           // create problem folder if not exist
+            fs.mkdirSync(problemPath);                   
+        }        
+        let inputPath = path.join(problemPath,'input.txt');
+        let outputPath = path.join(problemPath,'output.txt');
+        let yourInputPath = path.join(problemPath,'your_input.txt');
+        let yourOutputPath = path.join(problemPath,'your_output.txt');
+        let codePath = path.join(problemPath,totalProbs[prob] + '.' + coding_lang);
+        //console.log(data);
+        for(let i=0;i<data.length;i+=2){
+            inputData += `(INPUT - ${(i/2)+1})\n${data[i]}\n`;                 // input 
+        }
+        for(let i=1;i<data.length;i+=2){
+            outputData += `(OUTPUT - ${Math.floor(i/2)+1})\n${data[i]}\n`;               // output
+        }
+        //console.log('input ------- > '+inputData);
+        //console.log('output ------- > '+outputData);
+        fs.writeFileSync(inputPath,inputData,function(err){      // create input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(outputPath,outputData,function(err){   // create output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourInputPath,"",function(err){      // create your_input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourOutputPath,"",function(err){   // create your_output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.copyFileSync(codeTemplatePath,codePath);                            // create code file
+    }
+
+    console.log('test cases download successfully...!!');
+    await browser.close();
+
+}
+
 function setPaths(){
     src = process.cwd();
     dest = path.join(src,'code');
