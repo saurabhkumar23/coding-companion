@@ -1,0 +1,31 @@
+{
+  "name": "coding-companion",
+  "version": "1.0.0",
+  "description": "It download test cases of all the coding problems from the platform and",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saurabhkumar23/coding-companion.git"
+  },
+  "keywords": [
+    "puppeteer",
+    "coding",
+    "javascript",
+    "automation",
+    "bots",
+    "test-cases"
+  ],
+  "author": "Saurabh Kumar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saurabhkumar23/coding-companion/issues"
+  },
+  "homepage": "https://github.com/saurabhkumar23/coding-companion#readme",
+  "dependencies": {
+    "puppeteer": "^9.1.1",
+    "readline-sync": "^1.4.10"
+  }
+}
