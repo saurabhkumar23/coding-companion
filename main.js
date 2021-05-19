@@ -45,3 +45,6 @@ let cfUrl = 'https://codeforces.com/contest/'+contestId;
 let lcUrl = 'https://leetcode.com/contest/'+contestId;
 let ccUrl = 'https://www.codechef.com/'+contestId;
 let acUrl = 'https://atcoder.jp/contests/'+contestId+'/tasks';
+
+// ask for coding language
+coding_lang = readline.question('Enter your coding language: (cpp / java / py)\n')
