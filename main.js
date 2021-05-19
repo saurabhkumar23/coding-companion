@@ -37,3 +37,6 @@ else if(platform == '3'){
 else if(platform == '4'){
     platform = 'atcoder'
 }
+
+// ask for contest id
+contestId = readline.question('Enter your contest ID (you will find it on the contest page URL, get copy paste from there!)\n')
