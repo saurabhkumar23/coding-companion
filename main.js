@@ -233,6 +233,105 @@ async function getCodechef() {
 
 }
 
+async function getLeetcode() {
+    const browser = await puppeteer.launch({
+        headless: false,
+        args: ['--start-fullscreen', '--disable-notifications', '--incognito'],
+        defaultViewport: null,
+        slowMo: 20,
+    });
+
+    let pages = await browser.pages();
+    let page = pages[0];
+
+    // leetcode contest
+    page.goto(lcUrl, {
+        waitUntil: 'networkidle2'
+    })
+    
+    // fetch no of problems
+    await page.waitForSelector('.list-group.hover-panel.contest-question-list .list-group-item a',{
+        visible:true
+    });
+    let totalProbs = await page.$$eval('.list-group.hover-panel.contest-question-list .list-group-item a', probs => probs.map(prob => prob.textContent));
+
+    // modify prob array for navigation
+    for(let prob in totalProbs){
+        totalProbs[prob] = totalProbs[prob].split(' ');
+        totalProbs[prob] = totalProbs[prob].join('-');
+    }
+    
+    // login for the first problem
+    await page.goto('https://leetcode.com/contest/'+contestId+'/problems/'+totalProbs[0],{waitUntil:'networkidle2'});
+
+    // login process
+    await page.waitForSelector('#id_login',{
+        visible:true
+    });
+    await page.type('#id_login',leetEmail,{delay:100});        
+    await page.type('#id_password',leetPass,{delay:100});                      
+    await page.waitForSelector('#signin_btn',{
+        visible:true
+    });
+    await Promise.all([
+        page.waitForNavigation(),
+        await page.click('#signin_btn')
+    ]);
+
+    // go to every problem and download test cases
+    for(let prob in totalProbs){
+        await page.goto('https://leetcode.com/contest/'+contestId+'/problems/'+totalProbs[prob],{waitUntil:'networkidle2'});
+        await page.waitForSelector('.question-content.default-content',{
+            visible:true
+        });
+        let data = await page.$$eval('.question-content.default-content pre', arr => arr.map(e => e.textContent));
+        let inputData = '';
+        let outputData = '';
+        let problemPath = path.join(contestPath,totalProbs[prob]);                           // create problem path
+        if (fs.existsSync(problemPath) == false){           // create problem folder if not exist
+            fs.mkdirSync(problemPath);                   
+        }        
+        let inputPath = path.join(problemPath,'input.txt');
+        let outputPath = path.join(problemPath,'output.txt');
+        let yourInputPath = path.join(problemPath,'your_input.txt');
+        let yourOutputPath = path.join(problemPath,'your_output.txt');
+        let codePath = path.join(problemPath,totalProbs[prob] + '.' + coding_lang);
+        //console.log(data);
+        for(let i=0;i<data.length;i++){
+            let wholeItem = data[i].split('\n');
+            inputData += `${wholeItem[0]}\n`;                      // input 
+            outputData += `${wholeItem[1]}\n`;                    // output
+        }
+        //console.log('input ------- > '+inputData);
+        //console.log('output ------- > '+outputData);
+        fs.writeFileSync(inputPath,inputData,function(err){      // create input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(outputPath,outputData,function(err){   // create output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourInputPath,"",function(err){      // create your_input file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.writeFileSync(yourOutputPath,"",function(err){   // create your_output file                    
+            if(err){
+                return console.log(err);
+            }
+        });
+        fs.copyFileSync(codeTemplatePath,codePath);                            // create code file
+    }
+
+    console.log('test cases download successfully...!!');
+    await browser.close();
+
+}
+
 function setPaths(){
     src = process.cwd();
     dest = path.join(src,'code');
