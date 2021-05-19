@@ -23,3 +23,17 @@ if(platform !=  '1' && platform != '2' && platform != '3' && platform != '4'){
     console.log('Sorry, we have only these platforms available. choose correct option :)')
     process.exit()
 }
+else if(platform == '1'){
+    platform = 'codeforces'
+}
+else if(platform == '2'){
+    leetEmail = readline.question('write your leetcode email')
+    leetPass = readline.question('write your leetcode password')
+    platform = 'leetcode'
+}
+else if(platform == '3'){
+    platform = 'codechef'
+}
+else if(platform == '4'){
+    platform = 'atcoder'
+}
