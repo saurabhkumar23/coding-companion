@@ -30,7 +30,7 @@ else if(platform == '1'){
 }
 else if(platform == '2'){
     leetEmail = readline.question('write your leetcode email')
-    leetPass = readline.question('write your leetcode password')
+    leetPass = readline.question('write your leetcode password',{hideEchoBack: true})
     platform = 'leetcode'
 }
 else if(platform == '3'){

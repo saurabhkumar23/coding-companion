@@ -16,6 +16,7 @@ Open your Terminal/Command in the directory for the project and run these comman
 
 ## Usage
 - run this command on your terminal:
+    - $npm link
     - $give-testcases
 - give your coding platform (codeforces/codechef/leetcode/atcoder)
 - for leetcode, you need to give your leetcode credentials.
@@ -36,3 +37,5 @@ Open your Terminal/Command in the directory for the project and run these comman
         - your_input.txt : testing your code.
         - your_output.txt : testing your code.
         - for eg:- A.cpp : of choosen template (cpp/java/python)
+
+
